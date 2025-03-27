@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrations for {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">
+            <i class="fas fa-users mr-2 text-indigo-500"></i>
+            Registrations for {{ event.title }}
+        </h1>
+        <div class="space-x-2">
+            <a href="{% url 'event_detail' event.pk %}" 
+               class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                <i class="fas fa-arrow-left mr-1"></i> Back to Event
+            </a>
+            <a href="#" 
+               class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700">
+                <i class="fas fa-download mr-1"></i> Export CSV
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+        <div class="p-6">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendee</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount Paid</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for registration in registrations %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-indigo-500"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ registration.user.username }}</div>
+                                        <div class="text-sm text-gray-500">{{ registration.user.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ registration.registration_date|date:"M j, Y g:i A" }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {% if registration.payment_status %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Paid
+                                    </span>
+                                {% else %}
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        Pending
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {% if registration.payment_status %}
+                                    ${{ event.price }}
+                                {% else %}
+                                    $0
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="#" class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                                <a href="#" class="text-indigo-600 hover:text-indigo-900">
+                                    <i class="fas fa-print"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                No registrations yet for this event.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Registration Summary</h2>
+            <div class="grid gap-6 md:grid-cols-4">
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-indigo-800 mb-1">Total Registrations</h3>
+                    <p class="text-2xl font-bold text-indigo-600">{{ registrations.count }}</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-green-800 mb-1">Paid Registrations</h3>
+                    <p class="text-2xl font-bold text-green-600">{{ paid_count }}</p>
+                </div>
+                <div class="bg-yellow-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-yellow-800 mb-1">Pending Payments</h3>
+                    <p class="text-2xl font-bold text-yellow-600">{{ pending_count }}</p>
+                </div>
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-purple-800 mb-1">Total Revenue</h3>
+                    <p class="text-2xl font-bold text-purple-600">${{ total_revenue }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
